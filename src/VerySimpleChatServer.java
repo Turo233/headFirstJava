@@ -64,6 +64,7 @@ public class VerySimpleChatServer {
         while (it.hasNext()) {
             try {
                 PrintWriter writer = (PrintWriter) it.next();
+                System.out.println("Write: " + message);
                 writer.println(message);
                 writer.flush();
             } catch (Exception ex) {

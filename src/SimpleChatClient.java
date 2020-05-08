@@ -1,7 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,10 +26,29 @@ public class SimpleChatClient {
         incoming.setLineWrap(true);
         incoming.setWrapStyleWord(true);
         incoming.setEditable(false);
+        incoming.append("Welcome!\n");
         JScrollPane qScroller = new JScrollPane(incoming);
         qScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         qScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         outgoing = new JTextField(20);
+        outgoing.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    sendMsg();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
         JButton sendButton = new JButton("Send");
         sendButton.addActionListener(new SendButtonListener());
         mainPanel.add(qScroller);
@@ -41,7 +59,7 @@ public class SimpleChatClient {
         readerThread.start();
 
         frame.getContentPane().add(BorderLayout.CENTER, mainPanel);
-        frame.setSize(400, 500);
+        frame.setSize(700, 500);
         frame.setVisible(true);
     }
 
@@ -59,15 +77,20 @@ public class SimpleChatClient {
 
     public class SendButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            try {
-                writer.println(outgoing.getText());
-                writer.flush();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            outgoing.setText("");
-            outgoing.requestFocus();
+            sendMsg();
         }
+    }
+
+    public void sendMsg() {
+        try {
+            writer.println(outgoing.getText());
+            writer.flush();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        outgoing.setText("");
+        outgoing.requestFocus();
+
     }
 
     public class IncomingReader implements Runnable {
@@ -76,7 +99,7 @@ public class SimpleChatClient {
             try {
                 while ((message = reader.readLine()) != null) {
                     incoming.append(message + "\n");
-                    System.out.println("read " + message);
+                    System.out.println("receive: " + message);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
